@@ -1,11 +1,12 @@
 import { makeExecutableSchema, addMockFunctionsToSchema } from 'graphql-tools';
-import mocks from './mocks';
 import resolvers from './resolvers.js';
 const typeDefs = `
 type Query {
   passenger(firstName: String, lastName: String): Passenger
   allPassengers: [Passenger]
-  getFortuneCookie: String # we'll use this later
+  flightPax(passengerId: Int, flightId: Int): FlightPax
+  allFlightPaxs: [FlightPax]
+  allFlights: [Flight]
 }
 type Passenger {
   id: Int
@@ -20,6 +21,10 @@ type Flight {
   destination: String
   flightPaxs: [FlightPax]
 }
+type Pnr {
+  id: Int
+
+}
 type FlightPax {
   id: Int
   passenger: Passenger
@@ -30,6 +35,4 @@ type FlightPax {
 `;
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
-
-
 export default schema;

@@ -1,36 +1,42 @@
+import {Passenger, Flight, FlightPax} from './connectors.js';
 const resolvers = {
   Query: {
-    passenger(root, args) {
-      return { id: 1, firstName: 'Hello', lastName: 'World' };
+    passenger(_, args) {
+      return Passenger.find({where: args});
     },
-    allPassengers() {
-      return [{ id: 1, firstName: 'Hello', lastName: 'World' }];
+    allPassengers(_, args) {
+      return Passenger.findAll();
+    },
+    flightPax(_,args) {
+      return FlightPax.find({where: {passenger_id: args.passengerId, flight_id:args.flightId}});
+    },
+    allFlightPaxs(_, args) {
+      return FlightPax.findAll();
+    },
+    allFlights(_,args) {
+      return Flight.findAll();
     }
   },
   Passenger: {
     flightPaxs(passenger) {
-      return [
-        { id: 1, embarkation: 'IAD', debarkation: 'DCA' },
-        { id: 2, embarkation: 'BWI', debarkation: 'MIA' }
-      ];
+      return FlightPax.findAll({where: {passenger_id: passenger.id}});
     }
   },
   Flight: {
     flightPaxs(flight) {
-      return [
-        { id: 1, embarkation: 'IAD', debarkation: 'DCA'},
-        { id: 2, embarkation: 'BWI', debarkation: 'MIA' }
-      ];
+      return FlightPax.findAll({where: {flight_id: flight.id}});
     }
   },
   FlightPax: {
-    flight(flightpax) {
-      return {id: 1, flightNumber: 'ABC', origin:'IAD', destination: 'MIA'}
+    flight(flightPax) {
+      console.log(flightPax);
+      return flightPax.getFlight();
     },
-    passenger(flightpax) {
-      return {id: 1, firstName: John, lastName: Doe}
+    passenger(flightPax) {
+      return flightPax.getPassenger();
     }
   }
 };
+
 
 export default resolvers;
