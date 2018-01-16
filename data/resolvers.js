@@ -1,4 +1,4 @@
-import {Passenger, Flight, FlightPax} from './connectors.js';
+import {Passenger, Flight, Apis, Pnr, PnrPassenger, PnrFlight} from './connectors.js';
 const resolvers = {
   Query: {
     passenger(_, args) {
@@ -7,36 +7,63 @@ const resolvers = {
     allPassengers(_, args) {
       return Passenger.findAll();
     },
-    flightPax(_,args) {
-      return FlightPax.find({where: {passenger_id: args.passengerId, flight_id:args.flightId}});
+    apis(_,args) {
+      return Apis.find({where: args});
     },
-    allFlightPaxs(_, args) {
-      return FlightPax.findAll();
+    allPnr(_,args) {
+      return Pnr.findAll();
     },
     allFlights(_,args) {
       return Flight.findAll();
     }
   },
   Passenger: {
-    flightPaxs(passenger) {
-      return FlightPax.findAll({where: {passenger_id: passenger.id}});
+    apis(passenger) {
+      return Apis.findAll({where: {passengerId: passenger.id}});
     }
   },
   Flight: {
-    flightPaxs(flight) {
-      return FlightPax.findAll({where: {flight_id: flight.id}});
+    apis(flight) {
+      return Apis.findAll({where: {flightId: flight.id}});
     }
   },
-  FlightPax: {
-    flight(flightPax) {
-      console.log(flightPax);
-      return flightPax.getFlight();
+  Pnr: {
+    passengers(pnr){
+      let options = {
+        where: {pnrId: pnr.id},
+        include: [Passenger],
+      }
+      //Situation where include tablenames where provided as key names
+      //This prevented mapping to Graphql
+      return PnrPassenger.findAll(options).then(result=> {
+        return result.map(elem=>{
+          return elem.passenger.dataValues
+        });
+      });
     },
-    passenger(flightPax) {
-      return flightPax.getPassenger();
+    flights(pnr){
+      let options = {
+        where: {pnrId: pnr.id},
+        include: [Flight],
+      }
+      //Situation where include tablenames where provided as key names
+      //This prevented mapping to Graphql
+      return PnrFlight.findAll(options).then(result=> {
+        return result.map(elem=>{
+          return elem.flight.dataValues
+        });
+      });
+    }
+  },
+  Apis: {
+    flight(apis) {
+      return apis.getFlight();
+    },
+    passenger(apis) {
+      return apis.getPassenger();
     }
   }
-};
 
+};
 
 export default resolvers;

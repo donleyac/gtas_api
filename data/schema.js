@@ -4,33 +4,42 @@ const typeDefs = `
 type Query {
   passenger(firstName: String, lastName: String): Passenger
   allPassengers: [Passenger]
-  flightPax(passengerId: Int, flightId: Int): FlightPax
-  allFlightPaxs: [FlightPax]
+  apis(passengerId: Int, flightId: Int, refNumber: String): Apis
+  allPnr: [Pnr]
   allFlights: [Flight]
 }
 type Passenger {
   id: Int
   firstName: String
   lastName: String
-  flightPaxs: [FlightPax]
+  apis: [Apis]
 }
 type Flight {
   id: Int
   flightNumber: String
   origin: String
   destination: String
-  flightPaxs: [FlightPax]
+  apis: [Apis]
 }
 type Pnr {
   id: Int
-
+  recordLocator: String
+  formOfPayment: String
+  baggageWeight: Float
+  totalBagCount: Int
+  excessBagCount: Int
+  passengers: [Passenger]
+  flights: [Flight]
 }
-type FlightPax {
+type Apis {
   id: Int
   passenger: Passenger
+  passengerId: Int
   flight: Flight
+  flightId: Int
   embarkation: String
   debarkation: String
+  refNumber: String
 }
 `;
 
