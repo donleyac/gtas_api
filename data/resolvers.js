@@ -1,4 +1,4 @@
-import {Passenger, Flight, Apis, Pnr, PnrPassenger, PnrFlight} from './connectors.js';
+import {Passenger, Flight, Apis, Pnr, Bag} from './connectors.js';
 const resolvers = {
   Query: {
     passenger(_, args) {
@@ -8,10 +8,18 @@ const resolvers = {
       return Passenger.findAll();
     },
     apis(_,args) {
-      return Apis.find({where: args});
+      return Apis.findAll({where: args});
     },
-    allPnr(_,args) {
-      return Pnr.findAll();
+    pnr(_,args) {
+      return Pnr.find({
+        include: [
+          {model: Passenger, where:{id: args.passengerId}},
+          {model: Flight, where:{id: args.flightId}}
+        ]
+      });
+    },
+    bag(_,args) {
+      return Bag.findAll({where: args});
     },
     allFlights(_,args) {
       return Flight.findAll();
@@ -20,39 +28,28 @@ const resolvers = {
   Passenger: {
     apis(passenger) {
       return Apis.findAll({where: {passengerId: passenger.id}});
+    },
+    bags(passenger){
+      return passenger.getBags();
     }
   },
   Flight: {
     apis(flight) {
       return Apis.findAll({where: {flightId: flight.id}});
+    },
+    bags(flight) {
+      return flight.getBags();
     }
   },
   Pnr: {
     passengers(pnr){
-      let options = {
-        where: {pnrId: pnr.id},
-        include: [Passenger],
-      }
-      //Situation where include tablenames where provided as key names
-      //This prevented mapping to Graphql
-      return PnrPassenger.findAll(options).then(result=> {
-        return result.map(elem=>{
-          return elem.passenger.dataValues
-        });
-      });
+      return pnr.getPassengers();
     },
     flights(pnr){
-      let options = {
-        where: {pnrId: pnr.id},
-        include: [Flight],
-      }
-      //Situation where include tablenames where provided as key names
-      //This prevented mapping to Graphql
-      return PnrFlight.findAll(options).then(result=> {
-        return result.map(elem=>{
-          return elem.flight.dataValues
-        });
-      });
+      return pnr.getFlights();
+    },
+    addresses(pnr){
+      return pnr.getAddresses();
     }
   },
   Apis: {
@@ -62,8 +59,7 @@ const resolvers = {
     passenger(apis) {
       return apis.getPassenger();
     }
-  }
-
+  },
 };
 
 export default resolvers;

@@ -22,13 +22,11 @@ const PassengerModel = db.define('passenger', {
   firstName: { type: Sequelize.STRING, field: 'first_name'},
   lastName: { type: Sequelize.STRING, field: 'last_name'},
 });
-
 const FlightModel = db.define('flight', {
   flightNumber: { type: Sequelize.STRING, field: 'full_flight_number'},
   origin: { type: Sequelize.STRING },
   destination: { type: Sequelize.STRING },
 });
-
 const ApisModel = db.define('flight_pax', {
   embarkation: { type: Sequelize.STRING },
   debarkation: { type: Sequelize.STRING },
@@ -36,7 +34,6 @@ const ApisModel = db.define('flight_pax', {
   passengerId: {type: Sequelize.BIGINT, field: 'passenger_id'},
   flightId: {type: Sequelize.BIGINT, field: 'flight_id'}
 });
-
 const PnrModel = db.define('pnr', {
   recordLocator: {type: Sequelize.STRING, field: 'record_locator'},
   formOfPayment: {type: Sequelize.STRING, field: 'form_of_payment'},
@@ -44,14 +41,32 @@ const PnrModel = db.define('pnr', {
   totalBagCount: {type: Sequelize.INTEGER, field: 'total_bag_count'},
   excessBagCount: {type: Sequelize.INTEGER, field: 'bag_count'}
 });
+const AddressModel = db.define('address', {
+  line1: {type: Sequelize.STRING},
+  line2: {type: Sequelize.STRING},
+  line3: {type: Sequelize.STRING},
+  city: {type: Sequelize.STRING},
+  country: {type: Sequelize.STRING}
+});
+const BagModel = db.define('bag', {
+  bagId: {type: Sequelize.STRING, field: 'bag_identification'},
+  dataSource: {type: Sequelize.STRING, field: 'data_source'},
+  destination: {type: Sequelize.STRING, field: 'destination_airport'},
+  passengerId: {type: Sequelize.BIGINT, field: 'passenger_id'},
+  flightId: {type: Sequelize.BIGINT, field: 'flight_id'}
+})
 
 const PnrPassengerModel = db.define('pnr_passenger', {
-  pnrId: {primaryKey: true, type: Sequelize.BIGINT, field: 'pnr_id', references: 'pnr'},
-  passengerId: {primaryKey: true, type: Sequelize.BIGINT, field: 'passenger_id'}
-})
+  pnrId: {type: Sequelize.BIGINT, field: 'pnr_id', references: 'pnr'},
+  passengerId: {type: Sequelize.BIGINT, field: 'passenger_id', references: 'passenger'}
+});
 const PnrFlightModel = db.define('pnr_flight', {
-  pnrId: {primaryKey: true, type: Sequelize.BIGINT, field: 'pnr_id', references: 'pnr'},
-  flightId: {primaryKey: true, type: Sequelize.BIGINT, field: 'flight_id'}
+  pnrId: {type: Sequelize.BIGINT, field: 'pnr_id', references: 'pnr'},
+  flightId: {type: Sequelize.BIGINT, field: 'flight_id', references: 'flight'}
+});
+const PnrAddressModel = db.define('pnr_address', {
+  pnrId: {type: Sequelize.BIGINT, field: 'pnr_id', references: 'pnr'},
+  addressId: {type: Sequelize.BIGINT, field: 'address_id', references: 'address'}
 })
 
 
@@ -60,21 +75,23 @@ FlightModel.hasMany(ApisModel);
 ApisModel.belongsTo(PassengerModel);
 ApisModel.belongsTo(FlightModel);
 
-PassengerModel.hasMany(PnrPassengerModel);
-PnrModel.hasMany(PnrPassengerModel);
-PnrPassengerModel.belongsTo(PassengerModel);
-PnrPassengerModel.belongsTo(PnrModel);
+PassengerModel.hasMany(BagModel);
+FlightModel.hasMany(BagModel);
+BagModel.belongsTo(PassengerModel);
+BagModel.belongsTo(FlightModel);
 
-FlightModel.hasMany(PnrFlightModel);
-PnrModel.hasMany(PnrFlightModel);
-PnrFlightModel.belongsTo(FlightModel);
-PnrFlightModel.belongsTo(PnrModel);
+PassengerModel.belongsToMany(PnrModel, {through: PnrPassengerModel});
+PnrModel.belongsToMany(PassengerModel,{through: PnrPassengerModel});
+FlightModel.belongsToMany(PnrModel, {through: PnrFlightModel});
+PnrModel.belongsToMany(FlightModel, {through: PnrFlightModel});
+AddressModel.belongsToMany(PnrModel, {through: PnrAddressModel});
+PnrModel.belongsToMany(AddressModel, {through: PnrAddressModel});
 
 const Passenger = db.models.passenger;
 const Flight = db.models.flight;
 const Apis = db.models.flight_pax;
 const Pnr = db.models.pnr;
-const PnrPassenger = db.models.pnr_passenger;
-const PnrFlight = db.models.pnr_flight;
+const Address = db.models.address;
+const Bag = db.models.bag;
 
-export {Passenger, Apis, Flight, Pnr, PnrPassenger, PnrFlight};
+export {Passenger, Apis, Flight, Pnr, Address, Bag};
