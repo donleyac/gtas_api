@@ -1,5 +1,4 @@
 import Sequelize from 'sequelize';
-import casual from 'casual';
 
 const db = new Sequelize('gtas', 'root', 'admin', {
   dialect: 'mysql',
