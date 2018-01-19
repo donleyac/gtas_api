@@ -1,5 +1,4 @@
 import Sequelize from 'sequelize';
-
 const db = new Sequelize('gtas', 'root', 'admin', {
   dialect: 'mysql',
   define: {
@@ -8,7 +7,6 @@ const db = new Sequelize('gtas', 'root', 'admin', {
     timestamps: false
   }
 });
-
 db.authenticate()
   .then(()=>{
     console.log('Connection has been established successfully.');
