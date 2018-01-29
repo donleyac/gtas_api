@@ -1,6 +1,8 @@
 import Sequelize from 'sequelize';
+//operatorsAliases set to false due to deprecated operator string warning
 const db = new Sequelize('gtas', 'root', 'admin', {
   dialect: 'mysql',
+  operatorsAliases: false,
   define: {
     freezeTableName: true,
     underscored: true,
@@ -70,8 +72,7 @@ const PnrFlightModel = db.define('pnr_flight', {
 const PnrAddressModel = db.define('pnr_address', {
   pnrId: {type: Sequelize.BIGINT, field: 'pnr_id', references: 'pnr'},
   addressId: {type: Sequelize.BIGINT, field: 'address_id', references: 'address'}
-})
-
+});
 
 PassengerModel.hasMany(ApisModel);
 FlightModel.hasMany(ApisModel);
