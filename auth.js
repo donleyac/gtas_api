@@ -1,11 +1,7 @@
 import passport from 'passport';
 import {Strategy as LocalStrategy} from 'passport-local';
 import jwt from 'jsonwebtoken';
-
-var records = [
-  {id: 1, username: 'alex', email:'donleyac@gmail.com', password: 'password'},
-  {id: 2, username: 'john', email:'john@gmail.com', password:'secure'}
-];
+import {ExternalUser} from './data/connectors.js';
 // Local Strategy, used to initially get token
 passport.use(new LocalStrategy(
   function(username, password, cb) {
@@ -23,13 +19,12 @@ export function serializeUser(req, res, next) {
   next();
 }
 export function findByCreds(username, password, cb) {
-  // database dummy - find user and verify password
-  for(let i=0; i<records.length; i++) {
-    if(records[i]['username']===username && records[i]['password']===password) {
-      cb(null, records[i]);
-    }
-  }
-  cb(null, false);
+  ExternalUser.find({where: {username:username, password:password}})
+    .then(value=>cb(null, value),
+      reason=>{
+        console.log(reason);
+        cb(null, false);
+      });
 }
 export function generateToken(req, res, next) {
   //expiresIn seconds
