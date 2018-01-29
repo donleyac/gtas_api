@@ -3,7 +3,6 @@ import {Strategy as LocalStrategy} from 'passport-local';
 import jwt from 'jsonwebtoken';
 import {ApiAccess} from './data/connectors.js';
 import bcrypt from 'bcrypt';
-
 // Local Strategy, used to initially get token
 passport.use(new LocalStrategy(
   function(username, password, cb) {
@@ -23,15 +22,12 @@ export function serializeUser(req, res, next) {
 export function findByCreds(username, password, cb) {
   ApiAccess.find({where: {username:username}})
     .then(user=>{
-        if(!user) {
-          cb("User not found", false)
-        }
-        if(bcrypt.compareSync(password, user.dataValues.password)){
-          cb(null, user);
-        }
-        else {
-          cb("Incorrect Password",false);
-        }
+        !user
+          ?cb("User not found", false)
+          :bcrypt.compare(password, user.dataValues.password)
+            .then(res=> {
+              res?cb(null, user):cb("Incorrect Password",false);
+            });
       },
       reason=>cb(reason, false));
 }
