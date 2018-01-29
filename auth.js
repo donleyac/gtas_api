@@ -1,7 +1,9 @@
 import passport from 'passport';
 import {Strategy as LocalStrategy} from 'passport-local';
 import jwt from 'jsonwebtoken';
-import {ExternalUser} from './data/connectors.js';
+import {ApiAccess} from './data/connectors.js';
+import bcrypt from 'bcrypt';
+
 // Local Strategy, used to initially get token
 passport.use(new LocalStrategy(
   function(username, password, cb) {
@@ -19,12 +21,19 @@ export function serializeUser(req, res, next) {
   next();
 }
 export function findByCreds(username, password, cb) {
-  ExternalUser.find({where: {username:username, password:password}})
-    .then(value=>cb(null, value),
-      reason=>{
-        console.log(reason);
-        cb(null, false);
-      });
+  ApiAccess.find({where: {username:username}})
+    .then(user=>{
+        if(!user) {
+          cb("User not found", false)
+        }
+        if(bcrypt.compareSync(password, user.dataValues.password)){
+          cb(null, user);
+        }
+        else {
+          cb("Incorrect Password",false);
+        }
+      },
+      reason=>cb(reason, false));
 }
 export function generateToken(req, res, next) {
   //expiresIn seconds

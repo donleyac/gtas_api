@@ -52,9 +52,10 @@ const BagModel = db.define('bag', {
   passengerId: {type: Sequelize.BIGINT, field: 'passenger_id'},
   flightId: {type: Sequelize.BIGINT, field: 'flight_id'}
 });
-const ExternalUserModel = db.define('external_user', {
+const ApiAccessModel = db.define('api_access', {
   username: {type:Sequelize.STRING},
   password: {type:Sequelize.STRING},
+  organization: {type:Sequelize.STRING},
   email: {type:Sequelize.STRING}
 });
 
@@ -95,6 +96,6 @@ const Apis = db.models.flight_pax;
 const Pnr = db.models.pnr;
 const Address = db.models.address;
 const Bag = db.models.bag;
-const ExternalUser = db.models.external_user;
+const ApiAccess = db.models.api_access;
 
-export {Passenger, Apis, Flight, Pnr, Address, Bag, ExternalUser};
+export {Passenger, Apis, Flight, Pnr, Address, Bag, ApiAccess};
