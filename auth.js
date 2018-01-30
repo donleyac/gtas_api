@@ -4,6 +4,7 @@ import {Strategy as LocalStrategy} from 'passport-local';
 import jwt from 'jsonwebtoken';
 import {ApiAccess} from './data/connectors.js';
 import bcrypt from 'bcrypt';
+import {jwtSecret, jwtExpire} from './config.js';
 
 // Local Strategy, used to initially get token
 passport.use(new LocalStrategy(
@@ -35,7 +36,7 @@ export function findByCreds(username:string, password:string, cb:(err:string|nul
 }
 export function generateToken(req:any, res:any, next:any):void {
   //expiresIn seconds
-  req.token = jwt.sign({id: req.user.id}, 'CHANGEME', {expiresIn: 120*60});
+  req.token = jwt.sign({id: req.user.id}, jwtSecret, {expiresIn: jwtExpire});
   next();
 }
 export function localResponse(req:any, res:any):void {

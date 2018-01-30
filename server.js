@@ -7,10 +7,10 @@ import morgan from 'morgan';
 import passport from 'passport';
 import {serializeUser, generateToken, localResponse} from './auth.js';
 import expressJwt from 'express-jwt';
+import {jwtSecret, PORT} from './config.js';
 
 const app = express();
-const PORT = 3000;
-const authenticateJwt = expressJwt({secret: 'CHANGEME'});
+const authenticateJwt = expressJwt({secret: jwtSecret});
 //Security middleware that prevents certain types of requests
 app.use(helmet());
 //Logs all http requests to console

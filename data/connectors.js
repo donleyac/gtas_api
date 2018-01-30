@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
+import {dbConfig} from './../config.js';
 //operatorsAliases set to false due to deprecated operator string warning
-const db = new Sequelize('gtas', 'root', 'admin', {
+const db = new Sequelize(dbConfig.name, dbConfig.user, dbConfig.pass, {
   dialect: 'mysql',
   operatorsAliases: false,
   define: {
